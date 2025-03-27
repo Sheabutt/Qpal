@@ -13,8 +13,6 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     />
-    <link rel="icon" type="image/png" href="robot.png">
-
     <style>
       :root {
         --primary: #2563eb; /* Royal Blue */
@@ -202,6 +200,10 @@
       .absolute {
         margin-top: 100px;
       }
+      .dito{
+        overflow-x: hidden;
+        max-height: 325px;
+      }
     </style>
   </head>
 
@@ -280,7 +282,7 @@
               </div>
               <button
                 type="submit"
-                class="w-full bg-purple-400 hover:bg-purple-500 text-white px-6 py-3 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg"
+                class="w-full bg-purple-400 hover:bg-purple-300 text-white px-6 py-3 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg"
               >
                 <i class="fas fa-plus mr-2"></i>Add Task
               </button>
@@ -290,8 +292,8 @@
 
         <!-- Tasks List -->
         <div class="md:col-span-2">
-          <div class="glass-effect rounded-xl p-6">
-            <div class="flex justify-between items-center mb-6">
+          <div class="dito glass-effect rounded-xl p-6">
+            <div class="flex justify-between items-center mb-6 sticky top-0 bg-white z-20">
               <h2 class="text-xl font-semibold text-slate-800">
                 Today's Tasks
               </h2>
@@ -799,10 +801,8 @@
           taskElement.innerHTML = `
                     <div class="flex items-center gap-4">
                         <div class="relative">
-                            <input type="checkbox" ${
-                              task.done ? "checked" : ""
-                            } 
-                                onchange="toggleTask(${index})" 
+                            <input type="checkbox" ${task.done ? "checked" : ""} 
+                                id="task-checkbox-${index}"
                                 class="w-5 h-5 rounded-full text-blue-600 cursor-pointer">
                             <div class="absolute inset-0 bg-blue-600 rounded-full transform scale-0 transition-transform ${
                               task.done ? "scale-100" : ""
@@ -831,12 +831,10 @@
                         </div>
                     </div>
                     <div class="flex gap-3">
-                        <button onclick="editTask(${index})" 
-                            class="text-blue-600 hover:text-blue-700 p-2 hover:bg-blue-50 rounded-full transition-colors">
+                        <button class="edit-task-btn text-blue-600 hover:text-blue-700 p-2 hover:bg-blue-50 rounded-full transition-colors">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button onclick="deleteTask(${index})" 
-                            class="text-red-600 hover:text-red-700 p-2 hover:bg-red-50 rounded-full transition-colors">
+                        <button class="delete-task-btn text-red-600 hover:text-red-700 p-2 hover:bg-red-50 rounded-full transition-colors">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -848,6 +846,16 @@
             const badge = taskElement.querySelector(".rounded-full");
             badge.classList.add("animate-pulse");
           }
+
+          // Add these event listeners after creating the taskElement:
+          const checkbox = taskElement.querySelector(`#task-checkbox-${index}`);
+          checkbox.addEventListener('change', () => toggleTask(index));
+
+          const editBtn = taskElement.querySelector('.edit-task-btn');
+          editBtn.addEventListener('click', () => editTask(index));
+
+          const deleteBtn = taskElement.querySelector('.delete-task-btn');
+          deleteBtn.addEventListener('click', () => deleteTask(index));
         });
       }
 
