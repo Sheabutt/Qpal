@@ -6,7 +6,6 @@
     <title>Daily Qpal - Your Personal Productivity Assistant</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="icon" type="image/png" href="robot.png">
     <style>
         :root {
             --primary: #2563eb;     /* Royal Blue */
@@ -142,13 +141,13 @@
             }
         }
 
-        /* Enhanced Centered Loader Styles */
+        /* Enhanced loader animations */
         .loader-container {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
+            height: 100vh;
             background-color: white;
             display: flex;
             justify-content: center;
@@ -168,20 +167,21 @@
             align-items: center;
             justify-content: center;
             position: relative;
-            width: 240px;
-            height: 240px;
+            width: 220px;
+            height: 220px;
         }
         
-        .loader-icon {
+        .loader-spinner {
             width: 80px;
             height: 80px;
             position: relative;
-            z-index: 2;
+            margin-bottom: 40px;
         }
         
         .loader-circle {
             border: 4px solid rgba(203, 157, 240, 0.3);
             border-top: 4px solid #3B82F6;
+            border-right: 4px solid #8B5CF6;
             border-radius: 50%;
             width: 100%;
             height: 100%;
@@ -195,35 +195,50 @@
             transform: translate(-50%, -50%);
             font-size: 1.5rem;
             color: #3B82F6;
+            animation: pulse 1.5s ease-in-out infinite alternate;
         }
         
         .loader-text {
             font-size: 1.25rem;
             font-weight: 600;
-            text-align: center;
+            margin-top: 20px;
             background: linear-gradient(90deg, #3B82F6, #8B5CF6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            z-index: 2;
+            animation: shimmer 2s infinite;
         }
         
-        .loader-icons-orbit {
+        /* Position the icons in fixed positions with improved animations */
+        .loader-icon-top {
             position: absolute;
             top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            animation: slow-rotate 12s linear infinite;
-            z-index: 1;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
         }
         
-        .loader-floating-icon {
+        .loader-icon-right {
             position: absolute;
             top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            animation: bounce 2s infinite 0.5s;
+        }
+        
+        .loader-icon-bottom {
+            position: absolute;
+            bottom: 40px; /* Adjusted to make room for text */
             left: 50%;
-            transform: translate(-50%, -50%) rotate(var(--rotation)) translateX(80px) rotate(calc(-1 * var(--rotation)));
-            animation: pulse 3s ease-in-out infinite;
-            animation-delay: var(--delay);
+            transform: translateX(-50%);
+            animation: bounce 2s infinite 1s;
+        }
+        
+        .loader-icon-left {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            animation: bounce 2s infinite 1.5s;
         }
         
         @keyframes spin {
@@ -231,23 +246,22 @@
             100% { transform: rotate(360deg); }
         }
         
-        @keyframes slow-rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
         
         @keyframes pulse {
-            0%, 100% { 
-                opacity: 0.7;
-                transform: translate(-50%, -50%) rotate(var(--rotation)) translateX(80px) rotate(calc(-1 * var(--rotation))) scale(0.8);
-            }
-            50% { 
-                opacity: 1;
-                transform: translate(-50%, -50%) rotate(var(--rotation)) translateX(80px) rotate(calc(-1 * var(--rotation))) scale(1);
-            }
+            0% { opacity: 0.6; transform: translate(-50%, -50%) scale(0.8); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
         }
         
-        /* Hide the body content until loaded */
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        
+        /* Keep body from scrolling while loading */
         body.loading {
             overflow: hidden;
         }
@@ -257,40 +271,38 @@
     <!-- Loader -->
     <div class="loader-container" id="loader">
         <div class="loader">
-            <!-- Main loader circle -->
-            <div class="loader-icon">
+            <!-- Main loader circle with robot -->
+            <div class="loader-spinner">
                 <div class="loader-circle"></div>
                 <div class="loader-logo">
                     <i class="fas fa-robot"></i>
                 </div>
             </div>
             
-            <!-- Animated productivity icons around the center -->
-            <div class="loader-icons-orbit">
-                <div class="loader-floating-icon" style="--rotation: 0deg; --delay: 0s;">
-                    <div class="bg-blue-100 w-10 h-10 rounded-full flex items-center justify-center">
-                        <i class="fas fa-tasks text-blue-600"></i>
-                    </div>
+            <!-- Icons in fixed positions around the spinner -->
+            <div class="loader-icon-top">
+                <div class="bg-blue-100 w-10 h-10 rounded-full flex items-center justify-center">
+                    <i class="fas fa-tasks text-blue-600"></i>
                 </div>
-                <div class="loader-floating-icon" style="--rotation: 90deg; --delay: 0.5s;">
-                    <div class="bg-purple-100 w-10 h-10 rounded-full flex items-center justify-center">
-                        <i class="fas fa-bell text-purple-600"></i>
-                    </div>
+            </div>
+            <div class="loader-icon-right">
+                <div class="bg-purple-100 w-10 h-10 rounded-full flex items-center justify-center">
+                    <i class="fas fa-bell text-purple-600"></i>
                 </div>
-                <div class="loader-floating-icon" style="--rotation: 180deg; --delay: 1s;">
-                    <div class="bg-green-100 w-10 h-10 rounded-full flex items-center justify-center">
-                        <i class="fas fa-calendar-check text-green-600"></i>
-                    </div>
+            </div>
+            <div class="loader-icon-bottom">
+                <div class="bg-green-100 w-10 h-10 rounded-full flex items-center justify-center">
+                    <i class="fas fa-calendar-check text-green-600"></i>
                 </div>
-                <div class="loader-floating-icon" style="--rotation: 270deg; --delay: 1.5s;">
-                    <div class="bg-yellow-100 w-10 h-10 rounded-full flex items-center justify-center">
-                        <i class="fas fa-clock text-yellow-600"></i>
-                    </div>
+            </div>
+            <div class="loader-icon-left">
+                <div class="bg-yellow-100 w-10 h-10 rounded-full flex items-center justify-center">
+                    <i class="fas fa-clock text-yellow-600"></i>
                 </div>
             </div>
             
-            <div class="loader-text mt-24">Loading Daily Qpal...</div>
-            <div class="text-sm text-slate-500 mt-2">Your productivity companion</div>
+            <!-- Loading text -->
+            <div class="loader-text">Loading Daily Qpal...</div>
         </div>
     </div>
 
@@ -711,20 +723,49 @@
     </footer>
 
     <script>
-        // Loader functionality
-        window.addEventListener('load', function() {
-            // Simulate loading time (remove this setTimeout in production)
-            setTimeout(function() {
-                const loader = document.getElementById('loader');
-                loader.classList.add('loader-hidden');
-                document.body.classList.remove('loading');
-                
-                // Remove loader from DOM after transition completes
-                loader.addEventListener('transitionend', function() {
-                    document.body.removeChild(loader);
-                });
-            }, 1500); // Adjust the time as needed (1.5 seconds in this example)
-        });
+        // Improved loader functionality
+        // Run this code immediately without waiting for DOMContentLoaded
+        (function() {
+            // Show loader immediately
+            const loader = document.getElementById('loader');
+            if (loader) {
+                // Make sure loader is visible
+                loader.style.opacity = '1';
+                loader.style.visibility = 'visible';
+            }
+            
+            // Hide loader after window load or timeout (whichever comes first)
+            const hideLoader = function() {
+                if (loader && !loader.classList.contains('loader-hidden')) {
+                    loader.classList.add('loader-hidden');
+                    document.body.classList.remove('loading');
+                    
+                    // Remove loader after transition
+                    const handleTransitionEnd = function() {
+                        if (loader && document.body.contains(loader)) {
+                            document.body.removeChild(loader);
+                        }
+                        // Clean up event listener
+                        loader.removeEventListener('transitionend', handleTransitionEnd);
+                    };
+                    
+                    loader.addEventListener('transitionend', handleTransitionEnd);
+                    
+                    // Fallback: If transitionend doesn't fire, remove loader after a delay
+                    setTimeout(function() {
+                        if (loader && document.body.contains(loader)) {
+                            document.body.removeChild(loader);
+                        }
+                    }, 1000); // 1 second after transition should start
+                }
+            };
+            
+            // Set a minimum display time for the loader
+            setTimeout(hideLoader, 2000);
+            
+            // Also hide loader when everything is fully loaded
+            window.addEventListener('load', hideLoader);
+        })();
 
         // Smooth scrolling for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
