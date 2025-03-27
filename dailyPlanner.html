@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daily Qpal</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary: #2563eb; /* Royal Blue */
+        --primary-dark: #1d4ed8;
+        --secondary: #475569; /* Slate */
+        --accent: #0ea5e9; /* Sky Blue */
+        --success: #059669; /* Emerald */
+        --danger: #dc2626; /* Red */
+        --background: #f8fafc; /* Slate 50 */
+        --surface: #ffffff; /* White */
+        --text: #1e293b; /* Slate 800 */
+        --text-light: #64748b; /* Slate 500 */
+      }
+      body {
+        background: url(image.jpg);
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        overflow-y: auto;
+
+        /* Blurring effect */
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+
+      /* Clipped Color Filter Overlay */
+      body::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+
+        /* Gradient overlay with clipping */
+        background: linear-gradient(
+          135deg,
+          rgba(203, 157, 240, 0.5),
+          rgba(240, 193, 225, 0.5)
+        );
+
+        mix-blend-mode: overlay; /* Enhances the blending effect */
+        z-index: -1; /* Keeps it behind content */
+      }
+
+      .mode-btn {
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+      }
+
+      .mode-btn:hover {
+        transform: translateY(-2px);
+        border-color: #3b82f6;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .chatbox div {
+        animation: fadeIn 0.3s ease-out;
+      }
+
+      .typing-dot {
+        animation: pulse 1s infinite;
+        margin: 0 2px;
+      }
+
+      .glass-effect {
+        background: var(--surface);
+        border: 1px solid rgba(148, 163, 184, 0.1);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .quick-action-btn {
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .quick-action-btn:hover {
+        color: #3b82f6;
+        transform: translateY(-1px);
+      }
+
+      .quick-action-btn::after {
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 2px;
+        bottom: -2px;
+        left: 0;
+        background-color: #3b82f6;
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+      }
+
+      .quick-action-btn:hover::after {
+        transform: scaleX(1);
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+      }
+
+      .modal.active {
+        display: flex;
+        animation: fadeIn 0.3s ease-out;
+      }
+
+      .task-item {
+        transition: all 0.3s ease;
+      }
+
+      .task-item:hover {
+        transform: translateX(5px);
+      }
+
+      .task-done {
+        text-decoration: line-through;
+        opacity: 0.7;
+      }
+
+      @keyframes gentle-pulse {
+        0% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.6;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+      .animate-pulse {
+        animation: gentle-pulse 2s infinite;
+      }
+      .upper {
+        background: url(image2.jpg);
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: contain;
+        height: 200px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        border-radius: 20px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        margin-bottom: 10px;
+      }
+      .absolute {
+        margin-top: 100px;
+      }
+    </style>
+  </head>
+
+  <body class="bg-blue min-h-screen p-8 h-full">
+    <!-- Time Planner -->
+    <div class="container mx-auto max-w-4xl">
+        <a href="index.html" class="fixed top-10 left-4 bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg z-50 flex items-center">
+            <i class="fas fa-arrow-left mr-2"></i>Back</a>
+
+      <div class="upper">
+        <h1 class="absolute z-10 text-white text-4xl font-bold mt-[100px]">
+          A planner for your time, a chatbot for your mind.
+        </h1>
+        <img src="image2.jpg" />
+      </div>
+      <!-- Header Section -->
+      <div class="glass-effect rounded-2xl p-8 mb-8">
+        <div class="flex justify-between items-center">
+          <div>
+            <h1 class="text-4xl font-bold text-slate-800">Time Planner</h1>
+            <p class="text-slate-500 mt-2">Organize your day efficiently</p>
+          </div>
+          <div class="flex items-center gap-4">
+            <div class="text-right">
+              <p
+                class="text-2xl font-semibold text-slate-800"
+                id="current-time"
+              >
+                00:00
+              </p>
+              <p class="text-sm text-slate-500" id="current-date">Loading...</p>
+            </div>
+            <button
+              id="open-qpal"
+              class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg"
+            >
+              <i class="fas fa-robot mr-2"></i>Open Qpal
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Task Management Section -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Add Task Form -->
+        <div class="md:col-span-1">
+          <div class="glass-effect rounded-xl p-6">
+            <h2 class="text-xl font-semibold mb-4 text-slate-800">
+              Add New Task
+            </h2>
+            <form id="task-form" class="space-y-4">
+              <div>
+                <label
+                  for="task-title"
+                  class="block text-sm font-medium text-slate-700 mb-1"
+                  >Task Title</label
+                >
+                <input
+                  type="text"
+                  id="task-title"
+                  placeholder="Enter task title"
+                  class="w-full p-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
+                />
+              </div>
+              <div>
+                <label
+                  for="task-time"
+                  class="block text-sm font-medium text-slate-700 mb-1"
+                  >Time</label
+                >
+                <input
+                  type="time"
+                  id="task-time"
+                  class="w-full p-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
+                />
+              </div>
+              <button
+                type="submit"
+                class="w-full bg-purple-400 hover:bg-purple-300 text-white px-6 py-3 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg"
+              >
+                <i class="fas fa-plus mr-2"></i>Add Task
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Tasks List -->
+        <div class="md:col-span-2">
+          <div class="glass-effect rounded-xl p-6">
+            <div class="flex justify-between items-center mb-6">
+              <h2 class="text-xl font-semibold text-slate-800">
+                Today's Tasks
+              </h2>
+              <div class="text-sm text-slate-500">
+                <span id="tasks-count">0</span> tasks remaining
+              </div>
+            </div>
+            <div id="tasks-list" class="space-y-3"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Qpal Modal -->
+    <div id="qpal-modal" class="modal">
+      <div class="max-w-2xl w-full glass-effect shadow-2xl rounded-2xl m-auto">
+        <div
+          class="bg-gradient-to-r from-blue-500 to-purple-600 p-6 flex justify-between items-center rounded-2xl"
+        >
+          <h1 class="text-3xl font-bold text-white">Daily Qpal</h1>
+          <button
+            id="close-qpal"
+            class="text-white hover:text-gray-200 text-xl"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="p-8">
+          <div
+            id="daily-quote"
+            class="text-center text-gray-700 italic mb-8 p-6 bg-white/50 rounded-xl border-l-4 border-blue-500 shadow-md hover:shadow-lg transition-shadow duration-300"
+          ></div>
+
+          <div class="border-t pt-6">
+            <div
+              id="chatbox"
+              class="overflow-y-auto h-96 bg-white/50 p-6 mb-4 rounded-xl border border-gray-200 shadow-inner"
+            ></div>
+
+            <div
+              id="typing-indicator"
+              class="hidden text-gray-500 text-sm mb-2 ml-4"
+            >
+              <span class="typing-dot">●</span>
+              <span class="typing-dot" style="animation-delay: 0.2s">●</span>
+              <span class="typing-dot" style="animation-delay: 0.4s">●</span>
+            </div>
+
+            <div class="flex gap-3">
+              <input
+                id="user-input"
+                type="text"
+                class="flex-grow p-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm hover:shadow-md transition-shadow duration-300"
+                placeholder="Ask for a joke, quote, or motivation..."
+              />
+              <button
+                id="send-btn"
+                class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-4 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1"
+              >
+                <i class="fas fa-paper-plane"></i>
+              </button>
+            </div>
+
+            <div class="mt-6 flex justify-center gap-6">
+              <button
+                class="quick-action-btn text-gray-600 hover:text-blue-600"
+                data-action="joke"
+              >
+                <i class="fas fa-laugh-beam mr-2"></i>Tell me a joke
+              </button>
+              <span class="text-gray-300">|</span>
+              <button
+                class="quick-action-btn text-gray-600 hover:text-blue-600"
+                data-action="quote"
+              >
+                <i class="fas fa-quote-right mr-2"></i>Give me a quote
+              </button>
+              <span class="text-gray-300">|</span>
+              <button
+                class="quick-action-btn text-gray-600 hover:text-blue-600"
+                data-action="motivation"
+              >
+                <i class="fas fa-fire mr-2"></i>Motivate me
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // API endpoints
+      const JOKE_API = "https://official-joke-api.appspot.com/random_joke";
+      const QUOTE_API = "https://type.fit/api/quotes";
+
+      // Fallback quotes in case API fails
+      const FALLBACK_QUOTES = [
+        {
+          text: "The only way to do great work is to love what you do.",
+          author: "Steve Jobs",
+        },
+        {
+          text: "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+          author: "Winston Churchill",
+        },
+        {
+          text: "Believe you can and you're halfway there.",
+          author: "Theodore Roosevelt",
+        },
+        {
+          text: "The future belongs to those who believe in the beauty of their dreams.",
+          author: "Eleanor Roosevelt",
+        },
+        {
+          text: "Everything you can imagine is real.",
+          author: "Pablo Picasso",
+        },
+      ];
+
+      // Motivational messages
+      const MOTIVATIONAL_MESSAGES = [
+        "The only way to do great work is to love what you do.",
+        "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+        "Believe you can and you're halfway there.",
+        "The future belongs to those who believe in the beauty of their dreams.",
+        "Everything you can imagine is real.",
+        "The only limit to our realization of tomorrow will be our doubts of today.",
+        "Don't watch the clock; do what it does. Keep going.",
+        "The best way to predict the future is to create it.",
+        "Success is walking from failure to failure with no loss of enthusiasm.",
+        "Your time is limited, don't waste it living someone else's life.",
+      ];
+
+      // Add these constants at the top with other constants
+      const STORAGE_KEYS = {
+        CHAT_HISTORY: "qpal_chat_history",
+        DAILY_QUOTE: "qpal_daily_quote",
+        LAST_QUOTE_DATE: "qpal_quote_date",
+      };
+
+      // Helper functions
+      function getCurrentTime() {
+        return new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+
+      function showTypingIndicator() {
+        document.getElementById("typing-indicator").classList.remove("hidden");
+      }
+
+      function hideTypingIndicator() {
+        document.getElementById("typing-indicator").classList.add("hidden");
+      }
+
+      function addMessageToChat(message, isUser = false, messageType = "") {
+        const chatbox = document.getElementById("chatbox");
+        const time = getCurrentTime();
+        const messageClass = isUser
+          ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
+          : "bg-white";
+        const alignment = isUser ? "text-right" : "text-left";
+
+        const typeBadge = messageType
+          ? `
+                <span class="text-xs px-3 py-1 rounded-full font-medium ${
+                  messageType === "joke"
+                    ? "bg-yellow-100 text-yellow-700"
+                    : messageType === "quote"
+                    ? "bg-green-100 text-green-700"
+                    : messageType === "motivation"
+                    ? "bg-purple-100 text-purple-700"
+                    : ""
+                } ml-2 shadow-sm">
+                    <i class="fas ${
+                      messageType === "joke"
+                        ? "fa-laugh-beam"
+                        : messageType === "quote"
+                        ? "fa-quote-right"
+                        : messageType === "motivation"
+                        ? "fa-fire"
+                        : ""
+                    } mr-1"></i>
+                    ${messageType}
+                </span>
+            `
+          : "";
+
+        const messageHTML = `
+        <div class="${alignment} mb-4">
+            <span class="${messageClass} inline-block px-6 py-3 rounded-2xl shadow-md ${
+          !isUser ? "border border-gray-100" : ""
+        } max-w-[80%]">
+                ${message}
+                ${!isUser ? typeBadge : ""}
+            </span>
+            <div class="text-xs text-gray-400 mt-2 ${
+              isUser ? "mr-2" : "ml-2"
+            }">${time}</div>
+        </div>
+    `;
+
+        chatbox.innerHTML += messageHTML;
+        chatbox.scrollTop = chatbox.scrollHeight;
+
+        // Save to local storage
+        const chatHistory = JSON.parse(
+          localStorage.getItem(STORAGE_KEYS.CHAT_HISTORY) || "[]"
+        );
+        chatHistory.push({ message, isUser, time, messageType });
+        localStorage.setItem(
+          STORAGE_KEYS.CHAT_HISTORY,
+          JSON.stringify(chatHistory)
+        );
+      }
+
+      // API functions with error handling
+      async function getJoke() {
+        try {
+          const response = await fetch(JOKE_API);
+          if (!response.ok) throw new Error("Joke API failed");
+          const joke = await response.json();
+          return `${joke.setup} - ${joke.punchline}`;
+        } catch (error) {
+          console.error("Error fetching joke:", error);
+          return "Why don't programmers like nature? It has too many bugs! 😄";
+        }
+      }
+
+      async function getQuote() {
+        try {
+          const response = await fetch(QUOTE_API);
+          if (!response.ok) throw new Error("Quote API failed");
+          const quotes = await response.json();
+          const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+          return `"${randomQuote.text}" - ${randomQuote.author || "Unknown"}`;
+        } catch (error) {
+          console.error("Error fetching quote:", error);
+          const fallbackQuote =
+            FALLBACK_QUOTES[Math.floor(Math.random() * FALLBACK_QUOTES.length)];
+          return `"${fallbackQuote.text}" - ${fallbackQuote.author}`;
+        }
+      }
+
+      function getMotivation() {
+        return MOTIVATIONAL_MESSAGES[
+          Math.floor(Math.random() * MOTIVATIONAL_MESSAGES.length)
+        ];
+      }
+
+      // Event Listeners
+      document
+        .getElementById("send-btn")
+        .addEventListener("click", handleUserInput);
+      document
+        .getElementById("user-input")
+        .addEventListener("keypress", (e) => {
+          if (e.key === "Enter") handleUserInput();
+        });
+
+      // Quick action buttons
+      document.querySelectorAll(".quick-action-btn").forEach((button) => {
+        button.addEventListener("click", () => {
+          const action = button.dataset.action;
+          handleAction(action);
+        });
+      });
+
+      // Handle user input
+      async function handleUserInput() {
+        const userInput = document.getElementById("user-input").value.trim();
+        if (!userInput) return;
+
+        addMessageToChat(userInput, true);
+        document.getElementById("user-input").value = "";
+
+        showTypingIndicator();
+
+        let response;
+        let messageType = "";
+        try {
+          if (userInput.toLowerCase().includes("joke")) {
+            response = await getJoke();
+            messageType = "joke";
+          } else if (userInput.toLowerCase().includes("quote")) {
+            response = await getQuote();
+            messageType = "quote";
+          } else if (userInput.toLowerCase().includes("motiv")) {
+            response = getMotivation();
+            messageType = "motivation";
+          } else {
+            response =
+              "I can help you with jokes, quotes, or motivation! Just ask!";
+          }
+        } catch (error) {
+          console.error("Error handling user input:", error);
+          response =
+            "I'm having trouble connecting right now. Please try again in a moment!";
+        }
+
+        setTimeout(() => {
+          hideTypingIndicator();
+          addMessageToChat(response, false, messageType);
+        }, 1000);
+      }
+
+      // Handle quick actions
+      async function handleAction(action) {
+        showTypingIndicator();
+
+        let response;
+        try {
+          switch (action) {
+            case "joke":
+              response = await getJoke();
+              break;
+            case "quote":
+              response = await getQuote();
+              break;
+            case "motivation":
+              response = getMotivation();
+              break;
+          }
+
+          setTimeout(() => {
+            hideTypingIndicator();
+            addMessageToChat(response, false, action);
+          }, 1000);
+        } catch (error) {
+          console.error("Error handling action:", error);
+          response =
+            "I'm having trouble connecting right now. Please try again in a moment!";
+          setTimeout(() => {
+            hideTypingIndicator();
+            addMessageToChat(response, false);
+          }, 1000);
+        }
+      }
+
+      // Modify the initializeDailyQuote function
+      async function initializeDailyQuote() {
+        const today = new Date().toDateString();
+        const lastQuoteDate = localStorage.getItem(
+          STORAGE_KEYS.LAST_QUOTE_DATE
+        );
+        const savedQuote = localStorage.getItem(STORAGE_KEYS.DAILY_QUOTE);
+
+        // Only fetch new quote if it's a new day or no saved quote exists
+        if (today !== lastQuoteDate || !savedQuote) {
+          try {
+            const quote = await getQuote();
+            document.getElementById("daily-quote").textContent = quote;
+            localStorage.setItem(STORAGE_KEYS.DAILY_QUOTE, quote);
+            localStorage.setItem(STORAGE_KEYS.LAST_QUOTE_DATE, today);
+          } catch (error) {
+            console.error("Error initializing daily quote:", error);
+            const fallbackQuote =
+              FALLBACK_QUOTES[
+                Math.floor(Math.random() * FALLBACK_QUOTES.length)
+              ];
+            const quoteText = `"${fallbackQuote.text}" - ${fallbackQuote.author}`;
+            document.getElementById("daily-quote").textContent = quoteText;
+            localStorage.setItem(STORAGE_KEYS.DAILY_QUOTE, quoteText);
+            localStorage.setItem(STORAGE_KEYS.LAST_QUOTE_DATE, today);
+          }
+        } else {
+          document.getElementById("daily-quote").textContent = savedQuote;
+        }
+      }
+
+      // Add this function to load chat history
+      function loadChatHistory() {
+        const chatHistory = JSON.parse(
+          localStorage.getItem(STORAGE_KEYS.CHAT_HISTORY) || "[]"
+        );
+        const chatbox = document.getElementById("chatbox");
+
+        chatHistory.forEach(({ message, isUser, time, messageType }) => {
+          const messageClass = isUser
+            ? "bg-blue-500 text-white"
+            : "bg-gray-200";
+          const alignment = isUser ? "text-right" : "text-left";
+
+          const typeBadge = messageType
+            ? `
+                    <span class="text-xs px-2 py-1 rounded-full ${
+                      messageType === "joke"
+                        ? "bg-yellow-200 text-yellow-800"
+                        : messageType === "quote"
+                        ? "bg-green-200 text-green-800"
+                        : messageType === "motivation"
+                        ? "bg-purple-200 text-purple-800"
+                        : ""
+                    } ml-2">
+                        ${messageType}
+                    </span>
+                `
+            : "";
+
+          chatbox.innerHTML += `
+            <div class="${alignment} mb-2">
+                <span class="${messageClass} inline-block px-4 py-2 rounded-lg">
+                    ${message}
+                    ${!isUser ? typeBadge : ""}
+                </span>
+                <div class="text-xs text-gray-500 mt-1">${time}</div>
+            </div>
+        `;
+        });
+
+        chatbox.scrollTop = chatbox.scrollHeight;
+      }
+
+      // Modify the initialization section
+      // Initialize the app
+      initializeDailyQuote();
+      loadChatHistory();
+
+      // Task Management
+      const STORAGE_KEY_TASKS = "time_planner_tasks";
+
+      function saveTasks(tasks) {
+        localStorage.setItem(STORAGE_KEY_TASKS, JSON.stringify(tasks));
+      }
+
+      function loadTasks() {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY_TASKS) || "[]");
+      }
+
+      // Add this function to calculate time status
+      function getTimeStatus(taskTime) {
+        const now = new Date();
+        const currentTime = now.getHours() * 60 + now.getMinutes();
+        const [hours, minutes] = taskTime.split(":");
+        const taskTimeMinutes = parseInt(hours) * 60 + parseInt(minutes);
+        const timeDiff = taskTimeMinutes - currentTime;
+
+        if (timeDiff < 0) return "past";
+        if (timeDiff <= 5) return "imminent";
+        if (timeDiff <= 30) return "upcoming";
+        return "future";
+      }
+
+      // Update the renderTasks function
+      function renderTasks() {
+        const tasks = loadTasks();
+        const tasksList = document.getElementById("tasks-list");
+        const tasksCount = document.getElementById("tasks-count");
+        tasksList.innerHTML = "";
+
+        tasks.sort((a, b) => a.time.localeCompare(b.time));
+
+        const remainingTasks = tasks.filter((task) => !task.done).length;
+        tasksCount.textContent = remainingTasks;
+
+        if (tasks.length === 0) {
+          tasksList.innerHTML = `
+                    <div class="text-center py-8 text-slate-500">
+                        <i class="fas fa-tasks text-4xl mb-3"></i>
+                        <p>No tasks added yet</p>
+                    </div>
+                `;
+          return;
+        }
+
+        tasks.forEach((task, index) => {
+          const timeStatus = getTimeStatus(task.time);
+          const statusConfig = {
+            past: {
+              badge: "Overdue",
+              color: "bg-red-100 text-red-700",
+              icon: "fa-clock-rotate-left",
+            },
+            imminent: {
+              badge: "Starting Soon",
+              color: "bg-yellow-100 text-yellow-700",
+              icon: "fa-bell",
+            },
+            upcoming: {
+              badge: "Upcoming",
+              color: "bg-blue-100 text-blue-700",
+              icon: "fa-hourglass-half",
+            },
+            future: {
+              badge: "Scheduled",
+              color: "bg-green-100 text-green-700",
+              icon: "fa-calendar",
+            },
+          };
+
+          const { badge, color, icon } = statusConfig[timeStatus];
+
+          const taskElement = document.createElement("div");
+          taskElement.className = `task-item flex items-center justify-between p-4 bg-white rounded-xl border ${
+            timeStatus === "past"
+              ? "border-red-200"
+              : timeStatus === "imminent"
+              ? "border-yellow-200"
+              : "border-slate-100"
+          } ${
+            task.done ? "task-done opacity-75" : ""
+          } hover:shadow-md transition-all duration-300`;
+
+          taskElement.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <div class="relative">
+                            <input type="checkbox" ${
+                              task.done ? "checked" : ""
+                            } 
+                                onchange="toggleTask(${index})" 
+                                class="w-5 h-5 rounded-full text-blue-600 cursor-pointer">
+                            <div class="absolute inset-0 bg-blue-600 rounded-full transform scale-0 transition-transform ${
+                              task.done ? "scale-100" : ""
+                            } opacity-20"></div>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="font-medium ${
+                                  task.done
+                                    ? "line-through text-slate-400"
+                                    : "text-slate-800"
+                                }">${task.title}</h3>
+                                ${
+                                  !task.done
+                                    ? `
+                                    <span class="text-xs px-2 py-1 rounded-full font-medium ${color}">
+                                        <i class="fas ${icon} mr-1"></i>${badge}
+                                    </span>
+                                `
+                                    : ""
+                                }
+                            </div>
+                            <p class="text-sm text-slate-500 mt-1">
+                                <i class="fas fa-clock mr-1"></i>${task.time}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <button onclick="editTask(${index})" 
+                            class="text-blue-600 hover:text-blue-700 p-2 hover:bg-blue-50 rounded-full transition-colors">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="deleteTask(${index})" 
+                            class="text-red-600 hover:text-red-700 p-2 hover:bg-red-50 rounded-full transition-colors">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+          tasksList.appendChild(taskElement);
+
+          // Add pulsing animation for imminent tasks
+          if (timeStatus === "imminent" && !task.done) {
+            const badge = taskElement.querySelector(".rounded-full");
+            badge.classList.add("animate-pulse");
+          }
+        });
+      }
+
+      function addTask(title, time) {
+        const tasks = loadTasks();
+        tasks.push({ title, time, done: false });
+        saveTasks(tasks);
+        renderTasks();
+      }
+
+      function deleteTask(index) {
+        const tasks = loadTasks();
+        const task = tasks[index];
+
+        showConfirmDialog(
+          `Are you sure you want to delete "${task.title}"?`,
+          () => {
+            tasks.splice(index, 1);
+            saveTasks(tasks);
+            renderTasks();
+            showToast("Task deleted successfully");
+          }
+        );
+      }
+
+      function editTask(index) {
+        const tasks = loadTasks();
+        const task = tasks[index];
+
+        const dialog = document.createElement("div");
+        dialog.className =
+          "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
+        dialog.innerHTML = `
+                <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl">
+                    <h3 class="text-lg font-semibold text-slate-800 mb-4">Edit Task</h3>
+                    <form id="edit-form" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Task Title</label>
+                            <input type="text" class="w-full p-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                value="${task.title}" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Time</label>
+                            <input type="time" class="w-full p-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                value="${task.time}" required>
+                        </div>
+                        <div class="flex justify-end gap-3 mt-6">
+                            <button type="button" class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+                                onclick="this.closest('.fixed').remove()">
+                                Cancel
+                            </button>
+                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors">
+                                Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            `;
+
+        document.body.appendChild(dialog);
+
+        dialog.querySelector("#edit-form").addEventListener("submit", (e) => {
+          e.preventDefault();
+          const [titleInput, timeInput] = e.target.querySelectorAll("input");
+
+          tasks[index] = {
+            ...task,
+            title: titleInput.value.trim(),
+            time: timeInput.value,
+          };
+
+          saveTasks(tasks);
+          renderTasks();
+          dialog.remove();
+          showToast("Task updated successfully");
+        });
+      }
+
+      function toggleTask(index) {
+        const tasks = loadTasks();
+        tasks[index].done = !tasks[index].done;
+        saveTasks(tasks);
+        renderTasks();
+        showToast(tasks[index].done ? "Task completed!" : "Task uncompleted");
+      }
+
+      // Modal Management
+      const modal = document.getElementById("qpal-modal");
+      const openModalBtn = document.getElementById("open-qpal");
+      const closeModalBtn = document.getElementById("close-qpal");
+
+      openModalBtn.addEventListener("click", () => {
+        modal.classList.add("active");
+      });
+
+      closeModalBtn.addEventListener("click", () => {
+        modal.classList.remove("active");
+      });
+
+      // Close modal when clicking outside
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) {
+          modal.classList.remove("active");
+        }
+      });
+
+      // Form submission
+      document.getElementById("task-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const title = document.getElementById("task-title").value.trim();
+        const time = document.getElementById("task-time").value;
+
+        if (!title) {
+          showToast("Please enter a task title", "error");
+          return;
+        }
+
+        if (!time) {
+          showToast("Please select a time", "error");
+          return;
+        }
+
+        // Check if time is in the past
+        const [hours, minutes] = time.split(":");
+        const taskTime = new Date();
+        taskTime.setHours(parseInt(hours), parseInt(minutes), 0);
+
+        if (taskTime < new Date()) {
+          showToast("Cannot add tasks in the past", "error");
+          return;
+        }
+
+        addTask(title, time);
+        e.target.reset();
+      });
+
+      // Initialize tasks
+      renderTasks();
+
+      // Update time and date
+      function updateDateTime() {
+        const now = new Date();
+        document.getElementById("current-time").textContent =
+          now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        document.getElementById("current-date").textContent =
+          now.toLocaleDateString([], {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          });
+      }
+
+      setInterval(updateDateTime, 1000);
+      updateDateTime();
+
+      // Add these functions to your script section
+      function showConfirmDialog(message, onConfirm) {
+        const dialog = document.createElement("div");
+        dialog.className =
+          "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
+        dialog.innerHTML = `
+                <div class="bg-white rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl">
+                    <h3 class="text-lg font-semibold text-slate-800 mb-4">${message}</h3>
+                    <div class="flex justify-end gap-3">
+                        <button class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors" onclick="this.closest('.fixed').remove()">
+                            Cancel
+                        </button>
+                        <button class="px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded-lg transition-colors confirm-btn">
+                            Confirm
+                        </button>
+                    </div>
+                </div>
+            `;
+
+        document.body.appendChild(dialog);
+        dialog.querySelector(".confirm-btn").addEventListener("click", () => {
+          onConfirm();
+          dialog.remove();
+        });
+      }
+
+      function showToast(message, type = "success") {
+        const toast = document.createElement("div");
+        const bgColor =
+          type === "success"
+            ? "bg-green-500"
+            : type === "error"
+            ? "bg-red-500"
+            : "bg-blue-500";
+
+        toast.className = `fixed top-4 right-4 ${bgColor} text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in`;
+        toast.innerHTML = message;
+
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+      }
+
+      // Update the checkUpcomingTasks function
+      function checkUpcomingTasks() {
+        const tasks = loadTasks();
+        const now = new Date();
+        const currentTime = now.getHours() * 60 + now.getMinutes();
+
+        tasks.forEach((task) => {
+          if (!task.done) {
+            const [hours, minutes] = task.time.split(":");
+            const taskTime = parseInt(hours) * 60 + parseInt(minutes);
+            const timeDiff = taskTime - currentTime;
+
+            // Notify 5 minutes before task
+            if (timeDiff > 0 && timeDiff <= 5) {
+              // Browser notification
+              const notification = new Notification("Task Reminder", {
+                body: `Task "${task.title}" starts in ${timeDiff} minutes!`,
+                icon: "/favicon.ico",
+              });
+
+              // Visual toast notification
+              showToast(
+                `⏰ Task "${task.title}" starts in ${timeDiff} minutes!`,
+                "warning"
+              );
+            }
+          }
+        });
+
+        // Re-render tasks to update status indicators
+        renderTasks();
+      }
+
+      // Add this to your initialization code
+      document.addEventListener("DOMContentLoaded", () => {
+        requestNotificationPermission();
+        // Check for upcoming tasks every minute
+        setInterval(checkUpcomingTasks, 30000);
+      });
+
+      // Add notification permission request
+      function requestNotificationPermission() {
+        if ("Notification" in window) {
+          Notification.requestPermission();
+        }
+      }
+    </script>
+  </body>
+</html>

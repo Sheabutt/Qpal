@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Qpal - Your Personal Productivity Assistant</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;     /* Royal Blue */
+            --primary-dark: #1d4ed8;
+            --secondary: #475569;   /* Slate */
+            --accent: #0ea5e9;      /* Sky Blue */
+            --success: #059669;     /* Emerald */
+            --danger: #dc2626;      /* Red */
+            --background: #f8fafc;  /* Slate 50 */
+            --surface: #ffffff;     /* White */
+            --text: #1e293b;        /* Slate 800 */
+            --text-light: #64748b;  /* Slate 500 */
+        }
+        
+        body {
+            background: url(image.jpg);
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            position: relative;
+            min-height: 100vh;
+            overflow-x: hidden;
+            
+            /* Blurring effect */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        /* Clipped Color Filter Overlay */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(203, 157, 240, 0.5), rgba(240, 193, 225, 0.5));
+            mix-blend-mode: overlay;
+            z-index: -1;
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes floatAnimation {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+        }
+        
+        .animate-fade-in-up {
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+        
+        .animate-float {
+            animation: floatAnimation 6s ease-in-out infinite;
+        }
+        
+        .feature-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .gradient-text {
+            background: linear-gradient(90deg, #3B82F6, #8B5CF6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .hero-gradient {
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        
+        .btn-cta {
+            transition: all 0.3s ease;
+        }
+        
+        .btn-cta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3);
+        }
+        
+        .scroll-indicator {
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        /* New testimonial card style */
+        .testimonial-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .hero-section {
+                padding-top: 2rem;
+                padding-bottom: 2rem;
+            }
+            
+            .hero-image {
+                max-width: 300px;
+                margin: 0 auto;
+            }
+        }
+
+        /* Enhanced Centered Loader Styles */
+        .loader-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+        }
+        
+        .loader-hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .loader {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            width: 240px;
+            height: 240px;
+        }
+        
+        .loader-icon {
+            width: 80px;
+            height: 80px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .loader-circle {
+            border: 4px solid rgba(203, 157, 240, 0.3);
+            border-top: 4px solid #3B82F6;
+            border-radius: 50%;
+            width: 100%;
+            height: 100%;
+            animation: spin 1s linear infinite;
+        }
+        
+        .loader-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            color: #3B82F6;
+        }
+        
+        .loader-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            text-align: center;
+            background: linear-gradient(90deg, #3B82F6, #8B5CF6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            z-index: 2;
+        }
+        
+        .loader-icons-orbit {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            animation: slow-rotate 12s linear infinite;
+            z-index: 1;
+        }
+        
+        .loader-floating-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(var(--rotation)) translateX(80px) rotate(calc(-1 * var(--rotation)));
+            animation: pulse 3s ease-in-out infinite;
+            animation-delay: var(--delay);
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes slow-rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { 
+                opacity: 0.7;
+                transform: translate(-50%, -50%) rotate(var(--rotation)) translateX(80px) rotate(calc(-1 * var(--rotation))) scale(0.8);
+            }
+            50% { 
+                opacity: 1;
+                transform: translate(-50%, -50%) rotate(var(--rotation)) translateX(80px) rotate(calc(-1 * var(--rotation))) scale(1);
+            }
+        }
+        
+        /* Hide the body content until loaded */
+        body.loading {
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="min-h-screen loading">
+    <!-- Loader -->
+    <div class="loader-container" id="loader">
+        <div class="loader">
+            <!-- Main loader circle -->
+            <div class="loader-icon">
+                <div class="loader-circle"></div>
+                <div class="loader-logo">
+                    <i class="fas fa-robot"></i>
+                </div>
+            </div>
+            
+            <!-- Animated productivity icons around the center -->
+            <div class="loader-icons-orbit">
+                <div class="loader-floating-icon" style="--rotation: 0deg; --delay: 0s;">
+                    <div class="bg-blue-100 w-10 h-10 rounded-full flex items-center justify-center">
+                        <i class="fas fa-tasks text-blue-600"></i>
+                    </div>
+                </div>
+                <div class="loader-floating-icon" style="--rotation: 90deg; --delay: 0.5s;">
+                    <div class="bg-purple-100 w-10 h-10 rounded-full flex items-center justify-center">
+                        <i class="fas fa-bell text-purple-600"></i>
+                    </div>
+                </div>
+                <div class="loader-floating-icon" style="--rotation: 180deg; --delay: 1s;">
+                    <div class="bg-green-100 w-10 h-10 rounded-full flex items-center justify-center">
+                        <i class="fas fa-calendar-check text-green-600"></i>
+                    </div>
+                </div>
+                <div class="loader-floating-icon" style="--rotation: 270deg; --delay: 1.5s;">
+                    <div class="bg-yellow-100 w-10 h-10 rounded-full flex items-center justify-center">
+                        <i class="fas fa-clock text-yellow-600"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="loader-text mt-24">Loading Daily Qpal...</div>
+            <div class="text-sm text-slate-500 mt-2">Your productivity companion</div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 glass-effect shadow-md py-4">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <div class="bg-gradient-to-r from-blue-500 to-purple-600 w-10 h-10 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-robot text-white text-xl"></i>
+                </div>
+                <span class="text-2xl font-bold text-slate-800">Daily Qpal</span>
+            </div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#features" class="text-slate-600 hover:text-blue-600 transition-colors">Features</a>
+                <a href="#benefits" class="text-slate-600 hover:text-blue-600 transition-colors">Benefits</a>
+                <a href="#testimonials" class="text-slate-600 hover:text-blue-600 transition-colors">Testimonials</a>
+            </div>
+            <a href="dailyPlanner.html" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg">
+                Launch App
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section hero-gradient py-16 md:py-24 rounded-3xl my-8 mx-4 md:mx-8">
+        <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div class="animate-fade-in-up" style="animation-delay: 0.1s;">
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+                    Boost Your Productivity with <span class="gradient-text">Daily Qpal</span>
+                </h1>
+                <p class="text-slate-600 text-lg mb-8">
+                    Your intelligent companion for daily planning, task management, and motivation. 
+                    Stay organized, focused, and inspired throughout your day.
+                </p>
+                <div class="flex space-x-4">
+                    <a href="dailyPlanner.html" class="btn-cta bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-xl font-bold shadow-lg">
+                        Try it out!
+                    </a>
+                    <a href="#features" class="bg-white text-blue-600 border-2 border-blue-500 px-8 py-4 rounded-xl font-bold hover:bg-blue-50 transition-colors">
+                        Learn More
+                    </a>
+                </div>
+            </div>
+            <div class="animate-fade-in-up" style="animation-delay: 0.3s;">
+                <div class="relative">
+                    <div class="animate-float hero-image z-10 relative">
+                        <img src="https://images.unsplash.com/photo-1620608964186-18a8cfc2ad44?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" class="rounded-xl shadow-2xl w-full" alt="Daily Qpal App" />
+                    </div>
+                    <div class="absolute -bottom-5 -right-5 bg-blue-100 rounded-xl w-24 h-24 flex items-center justify-center z-0">
+                        <i class="fas fa-tasks text-blue-500 text-3xl"></i>
+                    </div>
+                    <div class="absolute -top-5 -left-5 bg-purple-100 rounded-xl w-24 h-24 flex items-center justify-center z-0">
+                        <i class="fas fa-robot text-purple-500 text-3xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flex justify-center mt-12">
+            <a href="#features" class="scroll-indicator text-slate-400">
+                <i class="fas fa-chevron-down text-2xl"></i>
+            </a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-transparent">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-6">Powerful Features</h2>
+                <p class="text-slate-600 max-w-2xl mx-auto">Discover how Daily Qpal transforms your daily productivity with these amazing features</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="feature-card glass-effect rounded-xl p-8 shadow-lg">
+                    <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-tasks text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Intelligent Task Management</h3>
+                    <p class="text-slate-600">
+                        Create, organize, and prioritize your tasks with smart reminders 
+                        and status updates. Never miss a deadline again.
+                    </p>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="feature-card glass-effect rounded-xl p-8 shadow-lg">
+                    <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-robot text-purple-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">AI Assistant Qpal</h3>
+                    <p class="text-slate-600">
+                        Your personal AI companion provides motivation, quotes, and jokes 
+                        to brighten your day and keep you motivated.
+                    </p>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="feature-card glass-effect rounded-xl p-8 shadow-lg">
+                    <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-bell text-green-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Smart Notifications</h3>
+                    <p class="text-slate-600">
+                        Get timely reminders when tasks are about to start. 
+                        Visual alerts and browser notifications keep you on track.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section id="benefits" class="py-20 glass-effect rounded-3xl my-8 mx-4 md:mx-8">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-6">Why Choose Daily Qpal?</h2>
+                <p class="text-slate-600 max-w-2xl mx-auto">Experience the benefits that thousands of users are already enjoying</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+                <div class="order-2 md:order-1">
+                    <ul class="space-y-6">
+                        <li class="flex items-start space-x-4">
+                            <div class="bg-blue-100 p-2 rounded-full mt-1">
+                                <i class="fas fa-check text-blue-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg">Increased Productivity</h3>
+                                <p class="text-slate-600">Users report up to 35% increase in daily task completion after using Daily Qpal.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start space-x-4">
+                            <div class="bg-blue-100 p-2 rounded-full mt-1">
+                                <i class="fas fa-check text-blue-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg">Reduced Stress</h3>
+                                <p class="text-slate-600">Clear planning and friendly reminders reduce the stress of managing multiple tasks.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start space-x-4">
+                            <div class="bg-blue-100 p-2 rounded-full mt-1">
+                                <i class="fas fa-check text-blue-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg">Daily Motivation</h3>
+                                <p class="text-slate-600">Stay motivated with inspirational quotes and a friendly AI assistant.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start space-x-4">
+                            <div class="bg-blue-100 p-2 rounded-full mt-1">
+                                <i class="fas fa-check text-blue-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg">Better Time Management</h3>
+                                <p class="text-slate-600">Visual time indicators help you manage your schedule efficiently.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="order-1 md:order-2">
+                    <img src="https://images.unsplash.com/photo-1640077597161-3ba5101624ec?q=80&w=1374&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" class="rounded-xl shadow-xl" alt="Daily Qpal Benefits" />
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="py-20 bg-transparent">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-6">What Our Users Say</h2>
+                <p class="text-slate-600 max-w-2xl mx-auto">Join thousands of satisfied users who have transformed their productivity</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="testimonial-card rounded-xl p-8 shadow-lg">
+                    <div class="flex items-center mb-6">
+                        <div class="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center mr-4">
+                            <span class="text-blue-700 font-bold">SM</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold">Sarah M.</h4>
+                            <p class="text-slate-500 text-sm">Marketing Manager</p>
+                        </div>
+                    </div>
+                    <p class="text-slate-600 italic">
+                        "Daily Qpal has completely transformed how I organize my workday. The task management 
+                        is intuitive, and I love getting motivational quotes when I need them most!"
+                    </p>
+                    <div class="mt-4 text-yellow-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="testimonial-card rounded-xl p-8 shadow-lg">
+                    <div class="flex items-center mb-6">
+                        <div class="w-12 h-12 bg-green-200 rounded-full flex items-center justify-center mr-4">
+                            <span class="text-green-700 font-bold">JD</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold">James D.</h4>
+                            <p class="text-slate-500 text-sm">Software Developer</p>
+                        </div>
+                    </div>
+                    <p class="text-slate-600 italic">
+                        "As a developer juggling multiple projects, Daily Qpal has been a game-changer. 
+                        The notifications ensure I never miss a meeting or deadline."
+                    </p>
+                    <div class="mt-4 text-yellow-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 3 -->
+                <div class="testimonial-card rounded-xl p-8 shadow-lg">
+                    <div class="flex items-center mb-6">
+                        <div class="w-12 h-12 bg-purple-200 rounded-full flex items-center justify-center mr-4">
+                            <span class="text-purple-700 font-bold">AL</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold">Aisha L.</h4>
+                            <p class="text-slate-500 text-sm">Medical Student</p>
+                        </div>
+                    </div>
+                    <p class="text-slate-600 italic">
+                        "Daily Qpal helps me stay on top of my busy study schedule. The chatbot feature 
+                        is fantastic when I need a quick mental break between study sessions!"
+                    </p>
+                    <div class="mt-4 text-yellow-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-3xl my-8 mx-4 md:mx-8">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6">Ready to Transform Your Productivity?</h2>
+            <p class="text-blue-100 max-w-2xl mx-auto mb-10">
+                Join thousands of users who have improved their daily productivity and reduced stress with Daily Qpal. 
+                It's free to get started!
+            </p>
+            <a href="dailyPlanner.html" class="btn-cta bg-white text-blue-600 px-10 py-4 rounded-xl font-bold shadow-lg inline-block">
+                Launch Daily Qpal Now
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer - Plain white design -->
+    <footer class="mt-16 bg-white shadow-md">
+        <!-- Subtle top border -->
+        <div class="h-1 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+        
+        <!-- Main footer content -->
+        <div class="py-16 px-4">
+            <div class="container mx-auto">
+                <!-- Top Section with Logo and Newsletter -->
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 pb-12 border-b border-gray-200">
+                    <div class="flex items-center space-x-4 mb-8 md:mb-0">
+                        <div class="bg-gradient-to-r from-blue-500 to-purple-600 w-12 h-12 rounded-xl flex items-center justify-center shadow-md">
+                            <i class="fas fa-robot text-white text-2xl"></i>
+                        </div>
+                        <span class="text-3xl font-bold text-slate-800">Daily <span class="gradient-text">Qpal</span></span>
+                    </div>
+                    
+                    <div class="w-full md:w-auto">
+                        <div class="border border-gray-300 rounded-xl p-1 flex items-center w-full md:w-auto">
+                            <input type="email" placeholder="Get updates via email" 
+                                class="border-none outline-none text-slate-600 placeholder-slate-400 px-4 py-3 w-full" />
+                            <button class="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg px-6 py-3 font-semibold whitespace-nowrap">
+                                Subscribe
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Main Footer Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
+                    <!-- Company Info -->
+                    <div>
+                        <h3 class="font-bold text-xl mb-6 text-slate-800">About Qpal</h3>
+                        <p class="text-slate-600 mb-6 leading-relaxed">
+                            Your intelligent companion for daily productivity and motivation. 
+                            We help you stay organized, focused, and inspired throughout your day.
+                        </p>
+                        <div class="flex space-x-4">
+                            <a href="#" class="border border-gray-200 hover:border-blue-500 text-slate-500 hover:text-blue-600 w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-300">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="border border-gray-200 hover:border-blue-500 text-slate-500 hover:text-blue-600 w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-300">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="#" class="border border-gray-200 hover:border-blue-500 text-slate-500 hover:text-blue-600 w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-300">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="border border-gray-200 hover:border-blue-500 text-slate-500 hover:text-blue-600 w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-300">
+                                <i class="fab fa-github"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Links -->
+                    <div>
+                        <h3 class="font-bold text-xl mb-6 text-slate-800">Quick Links</h3>
+                        <ul class="space-y-4">
+                            <li>
+                                <a href="#features" class="flex items-center text-slate-600 hover:text-blue-600 transition-colors duration-300">
+                                    <i class="fas fa-chevron-right text-xs mr-2 text-blue-500"></i>
+                                    Features
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#benefits" class="flex items-center text-slate-600 hover:text-blue-600 transition-colors duration-300">
+                                    <i class="fas fa-chevron-right text-xs mr-2 text-blue-500"></i>
+                                    Benefits
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#testimonials" class="flex items-center text-slate-600 hover:text-blue-600 transition-colors duration-300">
+                                    <i class="fas fa-chevron-right text-xs mr-2 text-blue-500"></i>
+                                    Testimonials
+                                </a>
+                            </li>
+                            <li>
+                                <a href="dailyPlanner.html" class="flex items-center text-slate-600 hover:text-blue-600 transition-colors duration-300">
+                                    <i class="fas fa-chevron-right text-xs mr-2 text-blue-500"></i>
+                                    Try It Now
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Resources -->
+                    <div>
+                        <h3 class="font-bold text-xl mb-6 text-slate-800">Resources</h3>
+                        <ul class="space-y-4">
+                            <li>
+                                <a href="#" class="flex items-center text-slate-600 hover:text-blue-600 transition-colors duration-300">
+                                    <i class="fas fa-book text-xs mr-2 text-blue-500"></i>
+                                    Documentation
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="flex items-center text-slate-600 hover:text-blue-600 transition-colors duration-300">
+                                    <i class="fas fa-life-ring text-xs mr-2 text-blue-500"></i>
+                                    Help & Support
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="flex items-center text-slate-600 hover:text-blue-600 transition-colors duration-300">
+                                    <i class="fas fa-shield-alt text-xs mr-2 text-blue-500"></i>
+                                    Privacy Policy
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="flex items-center text-slate-600 hover:text-blue-600 transition-colors duration-300">
+                                    <i class="fas fa-file-contract text-xs mr-2 text-blue-500"></i>
+                                    Terms of Service
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Contact -->
+                    <div>
+                        <h3 class="font-bold text-xl mb-6 text-slate-800">Contact Us</h3>
+                        <ul class="space-y-4">
+                            <li class="flex items-start">
+                                <i class="fas fa-map-marker-alt mt-1.5 mr-3 text-blue-500"></i>
+                                <span class="text-slate-600">123 Productivity Lane<br>Focus City, FC 98765</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-envelope mr-3 text-blue-500"></i>
+                                <a href="mailto:hello@dailyqpal.com" class="text-slate-600 hover:text-blue-600 transition-colors duration-300">hello@dailyqpal.com</a>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-phone-alt mr-3 text-blue-500"></i>
+                                <a href="tel:+15551234567" class="text-slate-600 hover:text-blue-600 transition-colors duration-300">(555) 123-4567</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Bottom Copyright Area -->
+                <div class="mt-16 pt-8 border-t border-gray-200 text-center">
+                    <p class="text-slate-500 text-sm">
+                        &copy; 2023 Daily Qpal. All rights reserved.
+                    </p>
+                    
+                    <!-- Bottom quick links -->
+                    <div class="flex flex-wrap justify-center mt-4 gap-x-8 gap-y-2 text-sm">
+                        <a href="#" class="text-slate-500 hover:text-blue-600 transition-colors duration-300">Privacy</a>
+                        <a href="#" class="text-slate-500 hover:text-blue-600 transition-colors duration-300">Terms</a>
+                        <a href="#" class="text-slate-500 hover:text-blue-600 transition-colors duration-300">Cookies</a>
+                        <a href="#" class="text-slate-500 hover:text-blue-600 transition-colors duration-300">FAQ</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Loader functionality
+        window.addEventListener('load', function() {
+            // Simulate loading time (remove this setTimeout in production)
+            setTimeout(function() {
+                const loader = document.getElementById('loader');
+                loader.classList.add('loader-hidden');
+                document.body.classList.remove('loading');
+                
+                // Remove loader from DOM after transition completes
+                loader.addEventListener('transitionend', function() {
+                    document.body.removeChild(loader);
+                });
+            }, 1500); // Adjust the time as needed (1.5 seconds in this example)
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+        
+        // Animation on scroll
+        window.addEventListener('scroll', function() {
+            const features = document.querySelectorAll('.feature-card');
+            
+            features.forEach(feature => {
+                const position = feature.getBoundingClientRect();
+                
+                // If element is in viewport
+                if(position.top < window.innerHeight && position.bottom >= 0) {
+                    feature.classList.add('animate-fade-in-up');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
